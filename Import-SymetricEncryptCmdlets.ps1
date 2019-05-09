@@ -10,20 +10,11 @@ function Get-KeyBytes {
     $KeyString
   )
 
-  $STD_BYTE_LENGTH = 32
-  $length = $KeyString.Length
-  $standardLengthString = ""
-
-
-  if ($length -ge $STD_BYTE_LENGTH) {
-    $standardLengthString = $KeyString.Substring(0, $STD_BYTE_LENGTH)
-  }
-  else {
-    $standardLengthString = $KeyString.PadRight($STD_BYTE_LENGTH, '0')
-  }
-
-  $encoding = New-Object System.Text.ASCIIEncoding
-  return $encoding.GetBytes($standardLengthString)
+  $keyStringBytes = [System.Text.Encoding]::UTF8.GetBytes($KeyString)
+  $sha256 = New-Object System.Security.Cryptography.SHA256Managed
+  $hash = $sha256.ComputeHash($keyStringBytes)
+  $sha256.Dispose()
+  return $hash
 }
 
 function ConvertTo-EncryptedData {
