@@ -17,6 +17,20 @@ function Get-KeyBytes {
   return $hash
 }
 
+function Get-Password {
+  try {
+    $secureString = Read-Host -AsSecureString -Prompt "password"
+    $unsecureString = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureString))
+    $keyStringBytes = [System.Text.Encoding]::UTF8.GetBytes($unsecureString)
+    $sha256 = New-Object System.Security.Cryptography.SHA256Managed
+    $hash = $sha256.ComputeHash($keyStringBytes)
+    return $hash
+  }
+  finally {
+    $sha256.Dispose()
+  }  
+}
+
 function ConvertTo-EncryptedData {
   Param(
     # key in byte array form
@@ -25,7 +39,7 @@ function ConvertTo-EncryptedData {
     $Key,
 
     # plain text string
-    [Parameter(Mandatory, Position=1)]
+    [Parameter(Mandatory, Position=1, ValueFromPipeline=$true)]
     [String]
     $PlainText
   )
@@ -44,7 +58,7 @@ function ConvertFrom-EncryptedData {
     $Key,
 
     # encrypted string
-    [Parameter(Mandatory, Position=1)]
+    [Parameter(Mandatory, Position=1, ValueFromPipeline=$true)]
     [String]
     $Data
   )
@@ -55,4 +69,18 @@ function ConvertFrom-EncryptedData {
       $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($_)
       [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
     }
+}
+
+function Test-Idea {
+
+  $secOne = Read-Host -AsSecureString -Prompt "pw one"
+  $secTwo = Read-Host -AsSecureString -Prompt "pw two"
+  $one = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secOne))
+  $two = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secTwo))
+  $kbOne = Get-KeyBytes -KeyString $one
+  $kbTwo = Get-KeyBytes -KeyString $two
+  $kbStrOne = [System.BitConverter]::ToString($kbOne)
+  $kbStrTwo = [System.BitConverter]::ToString($kbTwo)
+  Write-Host "$($kbStrOne -ceq $kbStrTwo)"
+  Write-Host "$kbStrOne`n$kbStrTwo"
 }
