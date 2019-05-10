@@ -70,3 +70,24 @@ function ConvertFrom-EncryptedData {
       [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
     }
 }
+
+function Get-EncryptedContent {
+  Param(
+    # encrypted file's path
+    [Parameter(Mandatory, Position=0)]
+    [String]
+    $Path,
+
+    # key in byte array form
+    [Parameter(Mandatory, Position=1)]
+    [Byte[]]
+    $Key
+  )
+
+  Get-Content -Path $Path -Encoding UTF8 -Raw `
+    | ConvertTo-SecureString -Key $Key `
+    | ForEach-Object {
+      $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($_)
+      [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+    }
+}
