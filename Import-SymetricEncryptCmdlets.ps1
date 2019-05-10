@@ -70,17 +70,3 @@ function ConvertFrom-EncryptedData {
       [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
     }
 }
-
-function Test-Idea {
-
-  $secOne = Read-Host -AsSecureString -Prompt "pw one"
-  $secTwo = Read-Host -AsSecureString -Prompt "pw two"
-  $one = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secOne))
-  $two = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secTwo))
-  $kbOne = Get-KeyBytes -KeyString $one
-  $kbTwo = Get-KeyBytes -KeyString $two
-  $kbStrOne = [System.BitConverter]::ToString($kbOne)
-  $kbStrTwo = [System.BitConverter]::ToString($kbTwo)
-  Write-Host "$($kbStrOne -ceq $kbStrTwo)"
-  Write-Host "$kbStrOne`n$kbStrTwo"
-}
