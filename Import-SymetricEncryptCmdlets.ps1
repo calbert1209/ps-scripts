@@ -10,11 +10,14 @@ function Get-KeyBytes {
     $KeyString
   )
 
-  $keyStringBytes = [System.Text.Encoding]::UTF8.GetBytes($KeyString)
-  $sha256 = New-Object System.Security.Cryptography.SHA256Managed
-  $hash = $sha256.ComputeHash($keyStringBytes)
-  $sha256.Dispose()
-  return $hash
+  try {
+    $keyStringBytes = [System.Text.Encoding]::UTF8.GetBytes($KeyString)
+    $sha256 = New-Object System.Security.Cryptography.SHA256Managed
+    return $sha256.ComputeHash($keyStringBytes)
+  }
+  finally {
+    $sha256.Dispose()
+  }
 }
 
 function Get-Password {
@@ -27,7 +30,12 @@ function Get-Password {
     return $hash
   }
   finally {
-    $sha256.Dispose()
+    if ($null -ne $sha256) {
+      $sha256.Dispose()
+    }
+    if ($null -ne $secureString) {
+      $secureString.Dispose()
+    }
   }  
 }
 
@@ -44,10 +52,17 @@ function ConvertTo-EncryptedData {
     $PlainText
   )
 
-  $secureStr = New-Object System.Security.SecureString
-  $chars = $PlainText.ToCharArray()
-  $chars | ForEach-Object { $secureStr.AppendChar($_) }
-  return ConvertFrom-SecureString -SecureString $secureStr -Key $Key
+  try {
+    $secureStr = New-Object System.Security.SecureString
+    $chars = $PlainText.ToCharArray()
+    $chars | ForEach-Object { $secureStr.AppendChar($_) }
+    return ConvertFrom-SecureString -SecureString $secureStr -Key $Key
+  }
+  finally {
+    if ($null -ne $secureStr) {
+      $secureStr.Dispose()
+    }
+  }
 }
 
 function ConvertFrom-EncryptedData {
@@ -63,12 +78,24 @@ function ConvertFrom-EncryptedData {
     $Data
   )
 
-  $Data `
-    | ConvertTo-SecureString -Key $Key `
-    | ForEach-Object {
-      $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($_)
-      [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+  Begin {
+
+  }
+  Process {
+    try {
+      $secureStr = ConvertTo-SecureString -String $Data -Key $Key
+      $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStr)
+      return [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
     }
+    finally {
+      if ($null -ne $secureStr) {
+        $secureStr.Dispose()
+      }
+    }
+  }
+  End {
+
+  }
 }
 
 function Get-EncryptedContent {
@@ -84,12 +111,18 @@ function Get-EncryptedContent {
     $Key
   )
 
-  Get-Content -Path $Path -Encoding UTF8 -Raw `
-    | ConvertTo-SecureString -Key $Key `
-    | ForEach-Object {
-      $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($_)
-      [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+  try {
+    $encryptedContent = Get-Content -Path $Path -Encoding UTF8 -Raw
+    $secureStr = ConvertTo-SecureString -String $encryptedContent -Key $Key
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStr)
+    [Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+  }
+  finally {
+    if ($null -ne $secureStr) {
+      $secureStr.Dispose()
     }
+  }
+
 }
 
 function Out-EncryptedFile {
@@ -126,18 +159,37 @@ function Out-EncryptedFile {
       }
     }
     
-    $chars = $lines.ToString().ToCharArray()
-    $secureStr = New-Object System.Security.SecureString
-    $chars | ForEach-Object { $secureStr.AppendChar($_) }
-    ConvertFrom-SecureString -SecureString $secureStr -Key $Key `
-      | Out-File -FilePath $Path -Encoding utf8
+    try {
+      $chars = $lines.ToString().ToCharArray()
+      $secureStr = New-Object System.Security.SecureString
+      $chars | ForEach-Object { $secureStr.AppendChar($_) }
+      ConvertFrom-SecureString -SecureString $secureStr -Key $Key `
+        | Out-File -FilePath $Path -Encoding utf8
+    }
+    finally {
+      if ($null -ne $secureStr) {
+        $secureStr.Dispose()
+      }
+    }
   }
 }
 
 function Test-Idea {
   $testFile = "C:\users\albert\Desktop\test.txt"
   $key = Get-KeyBytes -KeyString "mi6"
-  $array = "one", "two", "three"
-  $array | Out-EncryptedFile -Path $testFile -Key $key
-  Get-EncryptedContent -Path $testFile -Key $key
+  # $array = "one", "two", "three"
+  $secrets = @{
+    "dev"=@{
+      "db_user"="dbadmin"; 
+      "db_pass"="123456";
+    }
+    "production"=@{
+      "db_user"="lord_vorgon_the_destroyer"; 
+      "db_pass"="fluffy_the_kitten";
+    }
+  }
+  ConvertTo-Json -InputObject $secrets -Depth 2 -Compress `
+    | Out-EncryptedFile -Path $testFile -Key $key
+  $decoded = Get-EncryptedContent -Path $testFile -Key $key
+  ConvertFrom-Json -InputObject $decoded
 }
