@@ -1,4 +1,4 @@
-$FfmpegPath = "E:\applications\ffmpeg\bin\ffmpeg.exe"
+$FfmpegPath = "E:\applications\ffmpeg\4.2.1\bin\ffmpeg.exe"
 $target = "C:\Users\albert\Documents\file-conversion\video-files\inbox"
 
 function Ensure-Folder {
