@@ -9,9 +9,11 @@ function ConvertFrom-m4a {
 
     $video = Get-Item -Path $Path
     $outputBaseName = $video.BaseName -replace " ", "-"
+    $outputFileName = "$($outputBaseName).mp3"
+    $outputFilePath = Join-Path $video.Directory $outputFileName
     $ffmpegPath = "E:\applications\ffmpeg\4.2.1\bin\ffmpeg.exe"
-    $args = "-i `"$($video.FullName)`" `"$($outputBaseName).mp3`""
-    Start-Process -FilePath $ffmpegPath -ArgumentList $args -Wait -WindowStyle Hidden
+    $args = "-i `"$($video.FullName)`" `"$outputFilePath`" -loglevel quiet -hide_banner"
+    Start-Process -FilePath $ffmpegPath -ArgumentList $args -Wait -NoNewWindow
 }
 
 function Convert-m4aFiles {
