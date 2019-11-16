@@ -2,9 +2,10 @@
 function Invoke-FfmpegImage {
   param(
     # image id of ffmpeg container
-    [Parameter(Mandatory = $true)]
+    # defaults to jrottenberg/ffmpeg:4.1-scratch
+    [Parameter(Mandatory = $false)]
     [string]
-    $ImageID,
+    $ImageID = "7695c674109a",
 
     #args list
     [Parameter(Mandatory = $true)]
