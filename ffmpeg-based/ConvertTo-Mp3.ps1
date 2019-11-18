@@ -1,5 +1,5 @@
-$FfmpegPath = "E:\applications\ffmpeg\4.2.1\bin\ffmpeg.exe"
-$target = "C:\Users\albert\Documents\file-conversion\video-files\inbox"
+# an environment variable pointing to the local copy of ffmpeg.exe
+$FfmpegPath = $env:FFMPEG_PATH
 
 function Initialize-Folder {
     param([string] $DirPath)
