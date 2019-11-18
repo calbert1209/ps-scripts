@@ -1,4 +1,7 @@
 
+# A script to convert DayOne Journal app (iOS) .doentry files to standard markdown
+# .doentry files are xml based plist files
+
 # NOTE: This script assumes:
 #    a pre-created ".\entries\" sub-directory containing .doentry files.
 #    a pre-created ".\markdown\" sub-directory to hold generated .md files

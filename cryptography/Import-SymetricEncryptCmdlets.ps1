@@ -174,22 +174,22 @@ function Out-EncryptedFile {
   }
 }
 
-function Test-Idea {
-  $testFile = "C:\users\albert\Desktop\test.txt"
-  $key = Get-KeyBytes -KeyString "mi6"
-  # $array = "one", "two", "three"
-  $secrets = @{
-    "dev"=@{
-      "db_user"="dbadmin"; 
-      "db_pass"="123456";
-    }
-    "production"=@{
-      "db_user"="lord_vorgon_the_destroyer"; 
-      "db_pass"="fluffy_the_kitten";
-    }
-  }
-  ConvertTo-Json -InputObject $secrets -Depth 2 -Compress `
-    | Out-EncryptedFile -Path $testFile -Key $key
-  $decoded = Get-EncryptedContent -Path $testFile -Key $key
-  ConvertFrom-Json -InputObject $decoded
-}
+# function Test-Idea {
+#   $testFile = "C:\users\albert\Desktop\test.txt"
+#   $key = Get-KeyBytes -KeyString "mi6"
+#   # $array = "one", "two", "three"
+#   $secrets = @{
+#     "dev"=@{
+#       "db_user"="dbadmin"; 
+#       "db_pass"="123456";
+#     }
+#     "production"=@{
+#       "db_user"="lord_vorgon_the_destroyer"; 
+#       "db_pass"="fluffy_the_kitten";
+#     }
+#   }
+#   ConvertTo-Json -InputObject $secrets -Depth 2 -Compress `
+#     | Out-EncryptedFile -Path $testFile -Key $key
+#   $decoded = Get-EncryptedContent -Path $testFile -Key $key
+#   ConvertFrom-Json -InputObject $decoded
+# }

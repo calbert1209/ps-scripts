@@ -1,3 +1,6 @@
+$executingScriptDirPath = Split-Path $PSCommandPath -Parent
+$imageLoader = Join-Path $executingScriptDirPath "Import-FfmpegImageUtilities.ps1"
+. $imageLoader
 
 function ConvertFrom-m4a {
     param(
@@ -10,10 +13,8 @@ function ConvertFrom-m4a {
     $video = Get-Item -Path $Path
     $outputBaseName = $video.BaseName -replace " ", "-"
     $outputFileName = "$($outputBaseName).mp3"
-    $outputFilePath = Join-Path $video.Directory $outputFileName
-    $ffmpegPath = "E:\applications\ffmpeg\4.2.1\bin\ffmpeg.exe"
-    $args = "-i `"$($video.FullName)`" `"$outputFilePath`" -loglevel quiet -hide_banner"
-    Start-Process -FilePath $ffmpegPath -ArgumentList $args -Wait -NoNewWindow
+    $args = @("-i `"tmp/$($video.Name)`"", "`"tmp/$outputFileName`"")
+    Invoke-FfmpegImage -WorkingDir $video.Directory -Arguments $args
 }
 
 function Convert-m4aFiles {
