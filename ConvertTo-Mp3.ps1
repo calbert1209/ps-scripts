@@ -1,7 +1,7 @@
-$FfmpegPath = "E:\applications\ffmpeg\bin\ffmpeg.exe"
+$FfmpegPath = "E:\applications\ffmpeg\4.2.1\bin\ffmpeg.exe"
 $target = "C:\Users\albert\Documents\file-conversion\video-files\inbox"
 
-function Ensure-Folder {
+function Initialize-Folder {
     param([string] $DirPath)
 
     if(!(Test-Path $DirPath)) {
@@ -18,7 +18,7 @@ function ConvertTo-Mp3 {
     $videos = Get-ChildItem -Path $targetDir | Where-Object {$fileTypes.Contains($($_.Extension))}
 
     $outputDir = "${env:HOMEPATH}\Documents\file-conversion\audio\$targetDirLeaf"
-    Ensure-Folder -DirPath $outputDir
+    Initialize-Folder -DirPath $outputDir
     $videoCount = $videos.Count
     $index = 0
 
