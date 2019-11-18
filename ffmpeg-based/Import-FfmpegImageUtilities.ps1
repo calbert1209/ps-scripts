@@ -24,3 +24,5 @@ function Invoke-FfmpegImage {
 
   Start-Process -FilePath "docker" -ArgumentList $argList -Wait
 }
+
+# TODO: add function to call ffprobe within image

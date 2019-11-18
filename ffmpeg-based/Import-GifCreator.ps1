@@ -1,4 +1,6 @@
-. ./Import-FfmpegImageUtilities.ps1
+$executingScriptDirPath = Split-Path $PSCommandPath -Parent
+$imageLoader = Join-Path $executingScriptDirPath "Import-FfmpegImageUtilities.ps1"
+. $imageLoader
 function ConvertTo-Gif {
   param(
     # absolute path to file
