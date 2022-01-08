@@ -4,7 +4,7 @@ Some great advice I wish I had heard earlier when I was just starting:
 
 > One of the easiest ways to get started learning to program is to write scripts. Do you use a computer? Pay attention to the repetitive tasks you do on your computer. There is a good chance those can be scripted. Sure, you may need to invest some time to get your script running, but you will definitely learn something.
 
-The only way to truly learn something is when you needed. Using the scripts I created has, of course, stream-lined computer tasks, but moreover it has been very satisfying.
+The only way to truly learn something is when you need it. Using the scripts I created has, of course, stream-lined computer tasks, but moreover it has been very satisfying.
 
 # Setup
 
